@@ -7,7 +7,7 @@ from tensorflow.keras.preprocessing import image
 class CatAndDogModel:
     def __init__(self):
         self.model_path = os.path.join(os.getcwd(), "ml_models", "cat_dog_model.h5")
-        self.class_path = os.path.join(os.getcwd(), "ml_models", "class_names.json")
+        self.class_path = os.path.join(os.getcwd(), "ml_models", "class_names.txt")
         self.input_img_size = (128, 128)
         self.model = None
         self.class_indices = None
