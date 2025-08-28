@@ -1,8 +1,6 @@
 from pydantic import BaseModel
 
-class ImagePredRequestModel(BaseModel):
-    image: str  # Can be image path or base64 string
-
-class ImagePredResponseModel(BaseModel):
+class PredictionResponse(BaseModel):
     class_name: str
     confidence: float
+    image_base64: str  # added to include the uploaded image

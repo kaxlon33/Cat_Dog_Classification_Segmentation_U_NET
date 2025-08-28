@@ -10,6 +10,12 @@ fastapi = "*"
 uvicorn = "*"
 numpy = "*"
 pillow = "*"
+matplotlib = "*"
+pydot = "*"
+graphviz = "*"
+opencv-python = "*"
+keras-tuner = "*"
+python-multipart = "*"
 
 [dev-packages]
 

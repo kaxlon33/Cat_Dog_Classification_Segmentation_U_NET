@@ -1,59 +1,77 @@
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import FileResponse
-from contextlib import asynccontextmanager
+import numpy as np
+from PIL import Image
+import io
 import os
-import shutil
-from models.schema import ImagePredRequestModel, ImagePredResponseModel
-from model_work import CatAndDogModel
+import base64
 
-ml_models = {}
+from model_work import CatDogModel
+from models.schema import PredictionResponse
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    cat_dog_model = CatAndDogModel()
-    cat_dog_model.load_model()  # synchronous
-    ml_models['cat_dog_model'] = cat_dog_model
-    yield
-    ml_models.clear()
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI()
+
+# paths
+MODEL_PATH = os.path.join("ml_models", "unet_model_ml020.keras")
+CLASS_NAMES_PATH = os.path.join("ml_models", "class_names.json")
+
+# load model
+cat_dog_model = CatDogModel(MODEL_PATH, CLASS_NAMES_PATH)
+
+# ensure uploads folder exists
+UPLOAD_DIR = "uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @app.get("/")
-def read_root():
-    return {"message": "Welcome to Pet Segmentation & Classification API"}
+def root():
+    return {"message": "Cat vs Dog API is running!"}
 
-# JSON prediction endpoint
-@app.post("/predict", response_model=ImagePredResponseModel)
-def predict(body: ImagePredRequestModel):
-    cat_dog_model = ml_models["cat_dog_model"]
-    img_array = cat_dog_model.preprocess_image(body.image)
-    class_name, confidence = cat_dog_model.predict(img_array)
-
-    return {
-        "class_name": class_name,
-        "confidence": round(confidence, 2)
-    }
-
-# Image prediction + segmentation mask endpoint
-@app.post("/predict_image")
+@app.post("/predict_image", response_model=PredictionResponse)
 async def predict_image(file: UploadFile = File(...)):
-    cat_dog_model = ml_models["cat_dog_model"]
+    try:
+        # save uploaded file
+        input_path = os.path.join(UPLOAD_DIR, file.filename)
+        with open(input_path, "wb") as f:
+            f.write(await file.read())
 
-    # Ensure uploads folder exists
-    upload_dir = "uploads"
-    os.makedirs(upload_dir, exist_ok=True)
-    input_path = os.path.join(upload_dir, file.filename)
+        # load and preprocess image
+        img = Image.open(input_path).convert("RGB")
+        img_resized = img.resize((224, 224))
+        img_array = np.array(img_resized) / 255.0
 
-    # Save uploaded file temporarily
-    with open(input_path, "wb") as f:
-        shutil.copyfileobj(file.file, f)
+        # predict
+        result = cat_dog_model.predict(img_array)
 
-    # Preprocess + predict + save mask
-    img_array = cat_dog_model.preprocess_image(input_path)
-    output_path = cat_dog_model.predict_and_save_mask(img_array, input_path)
+        # encode image as base64
+        with open(input_path, "rb") as f:
+            img_bytes = f.read()
+        img_base64 = base64.b64encode(img_bytes).decode("utf-8")
 
-    return FileResponse(output_path, media_type="image/png")
+        return PredictionResponse(
+            class_name=result["class"],
+            confidence=result["confidence"],
+            image_base64=img_base64
+        )
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@app.get("/show/{filename}")
+async def show_image(filename: str):
+    file_path = os.path.join(UPLOAD_DIR, filename)
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    # Determine media type based on file extension
+    ext = os.path.splitext(filename)[1].lower()
+    if ext in [".jpg", ".jpeg"]:
+        media_type = "image/jpeg"
+    elif ext == ".png":
+        media_type = "image/png"
+    elif ext == ".gif":
+        media_type = "image/gif"
+    else:
+        media_type = "application/octet-stream"  # fallback for other files
+
+    return FileResponse(file_path, media_type=media_type)
