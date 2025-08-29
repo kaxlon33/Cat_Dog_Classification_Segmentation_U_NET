@@ -3,4 +3,4 @@ from pydantic import BaseModel
 class PredictionResponse(BaseModel):
     class_name: str
     confidence: float
-    image_base64: str  # added to include the uploaded image
+    image_base64: str  

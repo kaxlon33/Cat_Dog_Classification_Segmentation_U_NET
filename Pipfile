@@ -5,7 +5,6 @@ name = "pypi"
 
 [packages]
 pandas = "*"
-tensorflow = "*"
 fastapi = "*"
 uvicorn = "*"
 numpy = "*"
@@ -16,6 +15,7 @@ graphviz = "*"
 opencv-python = "*"
 keras-tuner = "*"
 python-multipart = "*"
+tensorflow = "*"
 
 [dev-packages]
 
