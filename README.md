@@ -6,7 +6,7 @@ Contributors:
 3. May Me Hlwan Myo - https://github.com/kaxlon33
 
 ## Project Overview
-====================
+
   This project provides an end-to-end pipeline for image annotation, segmentation, encoding, and classification of cat and dog images using deep learning. The solution leverages U-Net architecture with transfer learning for robust image segmentation and classification. A FastAPI backend serves predictions and segmentation results via RESTful endpoints, and the entire application is containerized with Docker for easy deployment.
   
 ## Workflow
