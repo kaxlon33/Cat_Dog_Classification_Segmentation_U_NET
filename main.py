@@ -26,6 +26,10 @@ last_uploaded_file = None
 def root():
     return {"message": "Cat vs Dog API is running!"}
 
+"""
+Uploads an image, performs cat/dog segmentation, and returns prediction results.
+
+"""
 @app.post("/predict_image", response_model=PredictionResponse)
 async def predict_image(file: UploadFile = File(...)):
     global last_uploaded_file, last_segmentation_file
@@ -89,6 +93,10 @@ async def predict_image(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+"""
+Generates a side-by-side comparison of the original image, mask, and overlay.
+
+"""
 @app.get("/compare")
 async def compare_images(alpha: float = 0.5):
     global last_uploaded_file, last_segmentation_file
