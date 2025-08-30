@@ -1,4 +1,4 @@
-Cat & Dog Classification and Segmentation with U-Net
+## Cat & Dog Classification and Segmentation with U-Net
 
 Contributors:
 1. Linn Lat Tun,
