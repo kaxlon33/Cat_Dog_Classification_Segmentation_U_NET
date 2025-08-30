@@ -12,19 +12,19 @@ Contributors:
 ## Workflow
 
 1.  Image Annotation:
-        Images of cats and dogs are manually annotated to create segmentation masks, enabling precise identification of regions of interest.
+        - Images of cats and dogs are manually annotated to create segmentation masks, enabling precise identification of regions of interest.
 
 2.  Image Segmentation & Encoding:
-        Annotated images are processed and segmented. The segmentation masks are encoded to prepare the dataset for model training.
+        - Annotated images are processed and segmented. The segmentation masks are encoded to prepare the dataset for model training.
 
 3.  Model Training:
-        The U-Net model, enhanced with transfer learning, is trained on the prepared dataset to perform accurate image segmentation and classification.
+        - The U-Net model, enhanced with transfer learning, is trained on the prepared dataset to perform accurate image segmentation and classification.
 
 4.  API Development:
-        A FastAPI application is built to provide endpoints for image classification and segmentation. Users can upload images and receive predictions and segmentation masks in real time.
+        - A FastAPI application is built to provide endpoints for image classification and segmentation. Users can upload images and receive predictions and segmentation masks in real time.
         
 5.  Containerization:
-        The project is packaged with Docker, allowing seamless deployment and scalability. The Docker container exposes the FastAPI service for easy integration.
+        - The project is packaged with Docker, allowing seamless deployment and scalability. The Docker container exposes the FastAPI service for easy integration.
 
 ##  Getting Started
 
