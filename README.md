@@ -12,7 +12,7 @@ Contributors:
 ## Workflow
 
 1.  Image Annotation:
-        - Images of cats and dogs are manually annotated to create segmentation masks, enabling precise identification of regions of interest.
+   - Images of cats and dogs are manually annotated to create segmentation masks, enabling precise identification of regions of interest.
 
 2.  Image Segmentation & Encoding:
         - Annotated images are processed and segmented. The segmentation masks are encoded to prepare the dataset for model training.
