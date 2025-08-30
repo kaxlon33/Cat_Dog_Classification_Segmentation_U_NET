@@ -1,6 +1,9 @@
 Cat & Dog Classification and Segmentation with U-Net
 
-Contributors: Linn Lat Tun, Hsu Pyae Thu, May Me Hlwan Myo
+Contributors:
+    Linn Lat Tun,
+    Hsu Pyae Thu,
+    May Me Hlwan Myo - https://github.com/kaxlon33
 
 ## Project Overview
 ====================
