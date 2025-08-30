@@ -2,7 +2,7 @@
 
 Contributors:
 1. Linn Lat Tun - https://github.com/sigmaava
-2. Hsu Pyae Thu,3
+2. Hsu Pyae Thu - https://github.com/hsupyae04-95
 3. May Me Hlwan Myo - https://github.com/kaxlon33
 
 ## Project Overview
