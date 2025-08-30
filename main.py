@@ -41,29 +41,40 @@ async def predict_image(file: UploadFile = File(...)):
         img_array = np.array(img_resized) / 255.0
 
         preds = cat_dog_model.model.predict(np.expand_dims(img_array, axis=0))[0]  
-        mask = np.argmax(preds, axis=-1)  # shape (128,128), values 0=bg, 1=cat, 2=dog
+        mask_model = np.argmax(preds, axis=-1)  # raw mask from model
+
+        mask = np.zeros_like(mask_model)
+        mask[mask_model == 0] = 0  # background
+        mask[mask_model == 1] = 2  # dog → 2
+        mask[mask_model == 2] = 1  # cat → 1
 
         colors = {
-            0: (0, 0, 0),       # black
-            1: (0, 255, 0),     # green
-            2: (0, 0, 255)      # blue
+            0: (0, 0, 0),       # black = background
+            1: (0, 255, 0),     # green = cat
+            2: (0, 0, 255)      # blue = dog
         }
         mask_rgb = np.zeros((mask.shape[0], mask.shape[1], 3), dtype=np.uint8)
         for k, color in colors.items():
             mask_rgb[mask == k] = color
 
-        # Save mask
         mask_img = Image.fromarray(mask_rgb)
         mask_filename = f"mask_{file.filename}"
         mask_path = os.path.join(UPLOAD_DIR, mask_filename)
         mask_img.save(mask_path)
         last_segmentation_file = mask_path
 
-        # Convert prediction to one main class (highest area)
-        unique, counts = np.unique(mask, return_counts=True)
-        main_class_index = unique[np.argmax(counts)]
+        mask_no_bg = mask[mask != 0]
+        if len(mask_no_bg) > 0:
+            unique, counts = np.unique(mask_no_bg, return_counts=True)
+            main_class_index = unique[np.argmax(counts)]
+        else:
+            main_class_index = 0  # fallback to background
+
+        # Correct class_names order
+        cat_dog_model.class_names = ["background", "cat", "dog"]
         main_class = cat_dog_model.class_names[main_class_index]
-        confidence = float(counts[np.argmax(counts)] / mask.size)
+
+        confidence = float((mask == main_class_index).sum() / mask.size)
 
         with open(input_path, "rb") as f:
             img_bytes = f.read()
@@ -78,24 +89,37 @@ async def predict_image(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/compare")
+async def compare_images(alpha: float = 0.5):
+    global last_uploaded_file, last_segmentation_file
 
-@app.get("/show")
-async def show_image(segmentation: bool = False):
-    file_to_show = last_segmentation_file if segmentation else last_uploaded_file
+    if not last_uploaded_file or not os.path.exists(last_uploaded_file):
+        raise HTTPException(status_code=404, detail="No original image available. Upload an image first.")
+    if not last_segmentation_file or not os.path.exists(last_segmentation_file):
+        raise HTTPException(status_code=404, detail="No segmentation mask available. Upload an image first.")
 
-    if not file_to_show or not os.path.exists(file_to_show):
-        raise HTTPException(status_code=404, detail="No image has been uploaded yet")
+    try:
+        original = Image.open(last_uploaded_file).convert("RGB")
+        mask = Image.open(last_segmentation_file).convert("RGBA").resize(original.size)
 
-    ext = os.path.splitext(file_to_show)[1].lower()
-    if ext in [".jpg", ".jpeg"]:
-        media_type = "image/jpeg"
-    elif ext == ".png":
-        media_type = "image/png"
-    else:
-        media_type = "application/octet-stream"
+        mask.putalpha(int(alpha * 255))
+        overlay_img = Image.alpha_composite(original.convert("RGBA"), mask)
 
-    return FileResponse(file_to_show, media_type=media_type)
+        width, height = original.size
+        combined = Image.new("RGB", (width * 3, height))
+        combined.paste(original, (0, 0))
+        combined.paste(mask.convert("RGB"), (width, 0))
+        combined.paste(overlay_img.convert("RGB"), (width * 2, 0))
 
+        compare_path = os.path.join(
+            UPLOAD_DIR, f"compare_{os.path.splitext(os.path.basename(last_uploaded_file))[0]}.png"
+        )
+        combined.save(compare_path, format="PNG")
+
+        return FileResponse(compare_path, media_type="image/png")
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Comparison failed: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn
