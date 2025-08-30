@@ -1,8 +1,8 @@
-## Cat & Dog Classification and Segmentation with U-Net
+## Cat & Dog Sematic Segmentation with U-Net
 
 Contributors:
 1. Linn Lat Tun - https://github.com/sigmaava
-2. Hsu Pyae Thu,
+2. Hsu Pyae Thu,3
 3. May Me Hlwan Myo - https://github.com/kaxlon33
 
 ## Project Overview
