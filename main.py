@@ -11,8 +11,8 @@ from models.schema import PredictionResponse
 
 app = FastAPI()
 
-MODEL_PATH = os.getcwd() + "/ml_models/unet_model_ml020.h5"
-CLASS_NAMES_PATH = os.getcwd() + "/ml_models/class_names.json"
+MODEL_PATH = os.path.join(os.getcwd(), "ml_models", "unet_model_ml020.h5")
+CLASS_NAMES_PATH = os.path.join(os.getcwd(), "ml_models", "class_names.json")
 
 cat_dog_model = CatDogModel(MODEL_PATH, CLASS_NAMES_PATH)
 
