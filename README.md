@@ -29,25 +29,21 @@ Contributors:
 ##  Getting Started
 
 1.  Install Dependencies
-    ## pip install -r requirement.txt
-    (or) if using pipenv
-      ## pipenv install
+       pip install -r requirement.txt (or) pipenv install
 
 2.  Prepare the Dataset
         Place your annotated images and segmentation masks in the dataset/cat_and_dog_dataset/images and dataset/cat_and_dog_dataset/masks directories.
         Ensure the dataset structure matches the provided example.
         
 3.  Train the Model (Optional)
-      use the provided pre-trained weights in
-     ## ml_models/unet_model_ml020.h5.
+      use the provided pre-trained weights in ml_models/unet_model_ml020.h5.
 
 4.  Run the FastAPI Server
-        Start the API server to serve predictions and segmentation results:
-    ## pipenv run python main.py
+        Start the API server to serve predictions and segmentation results: pipenv run python main.py
 
 5.  Use Docker for Deployment
         To build and run the application in a Docker container:
-    ## docker build -t cat-dog-segmentation .
+    docker build -t cat-dog-segmentation .
     ## docker run -p 8000:8000 cat-dog-segmentation
 
 6.  Access the API
