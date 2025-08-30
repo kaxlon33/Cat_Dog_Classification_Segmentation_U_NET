@@ -10,7 +10,6 @@ Contributors:
   This project provides an end-to-end pipeline for image annotation, segmentation, encoding, and classification of cat and dog images using deep learning. The solution leverages U-Net architecture with transfer learning for robust image segmentation and classification. A FastAPI backend serves predictions and segmentation results via RESTful endpoints, and the entire application is containerized with Docker for easy deployment.
   
 ## Workflow
-===============
 
 1.  Image Annotation:
         Images of cats and dogs are manually annotated to create segmentation masks, enabling precise identification of regions of interest.
@@ -28,8 +27,6 @@ Contributors:
         The project is packaged with Docker, allowing seamless deployment and scalability. The Docker container exposes the FastAPI service for easy integration.
 
 ##  Getting Started
-=====================
-    Follow these steps to set up and run the project:
 
 1.  Install Dependencies
     ## pip install -r requirement.txt
